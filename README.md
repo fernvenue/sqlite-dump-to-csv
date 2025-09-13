@@ -1,6 +1,12 @@
-# sqlite-dump-to-csv
+# SQLite Dump to CSV
+
+[![sqlite-dump-to-csv](https://img.shields.io/badge/LICENSE-MIT%20Liscense-blue?style=flat-square)](./LICENSE)
+[![sqlite-dump-to-csv](https://img.shields.io/badge/GitHub-SQLite%20Dump%20to%20CSV-blueviolet?style=flat-square&logo=github)](https://github.com/fernvenue/sqlite-dump-to-csv)
+
 Simple Python 3 script to dump a SQLite database to a set of CSV files.
 
-This script dumps SQLite database data into a set of CSV files, one for each table in the database. The script names each CSV file with the table name from the database. The first row of each CSV file has the table column names.
+## Usage
 
-Example Usage: python3 sqlite_dump.py --db sqlite.db --output ../data/
+```bash
+python3 sqlite_dump.py --db sqlite.db --output ../data/
+```
