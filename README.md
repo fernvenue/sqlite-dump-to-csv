@@ -8,5 +8,5 @@ Simple Python 3 script to dump a SQLite database to a set of CSV files.
 ## Usage
 
 ```bash
-python3 sqlite_dump.py --db sqlite.db --output ../data/
+python3 sqlite_dump.py --db mydb.sqlite --output ./csv_output/
 ```
