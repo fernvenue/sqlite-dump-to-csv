@@ -3,37 +3,75 @@ import codecs
 import os
 import sqlite3
 import csv
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 
 def main(db_file, output_dir):
+    logger.info(f"Connecting to database: {db_file}")
     con = sqlite3.connect(db_file)
     cur = con.cursor()
+
+    logger.info("Retrieving database table list...")
     cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
     tabs = cur.fetchall()
-    for tab in tabs:
+
+    if not tabs:
+        logger.warning("No tables found in database")
+        return
+
+    logger.info(f"Found {len(tabs)} tables, starting export...")
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        logger.info(f"Created output directory: {output_dir}")
+
+    exported_count = 0
+    for i, tab in enumerate(tabs, 1):
         tab = tab[0]
+        logger.info(f"[{i}/{len(tabs)}] Processing table: {tab}")
+
         cols = []
         try:
             cols = cur.execute("PRAGMA table_info('%s')" % tab).fetchall()
-        except:
-            cols = []
-        if len(cols) > 0:
-            fname = tab + '.csv'
-            print('Output: ' + fname)
-            path_fname = os.path.join(output_dir, fname)
-            f = codecs.open(path_fname, 'w', encoding='utf-8')
-            writer = csv.writer(f, dialect=csv.excel, quoting=csv.QUOTE_ALL)
-            field_name_row = []
-            for col in cols:
-                col_name = col[1]
-                field_name_row.append(col_name)
-            writer.writerow(field_name_row)
-            cur.execute("SELECT * FROM " + f"`{tab}`" + ";")
-            rows = cur.fetchall()
-            for row in rows:
-               writer.writerow(row)
-            f.closed
-    print("Done! " + output_dir)
+        except Exception as e:
+            logger.warning(f"Unable to get table structure for {tab}: {e}")
+            continue
+
+        if len(cols) == 0:
+            logger.warning(f"Table {tab} has no column information, skipping")
+            continue
+
+        fname = tab + '.csv'
+        path_fname = os.path.join(output_dir, fname)
+
+        try:
+            with codecs.open(path_fname, 'w', encoding='utf-8') as f:
+                writer = csv.writer(f, dialect=csv.excel, quoting=csv.QUOTE_ALL)
+
+                field_name_row = [col[1] for col in cols]
+                writer.writerow(field_name_row)
+
+                cur.execute("SELECT * FROM " + f"`{tab}`" + ";")
+                rows = cur.fetchall()
+
+                for row in rows:
+                    writer.writerow(row)
+
+                logger.info(f"Export completed: {fname} ({len(rows)} records)")
+                exported_count += 1
+
+        except Exception as e:
+            logger.error(f"Failed to export table {tab}: {e}")
+
+    con.close()
+    logger.info(f"Export completed! Exported {exported_count} tables to directory: {output_dir}")
 
 if __name__ == '__main__':
     import argparse
