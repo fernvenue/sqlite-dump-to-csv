@@ -1,9 +1,9 @@
 #! /usr/bin/env python3
 import codecs
-import os
-import sqlite3
 import csv
 import logging
+import os
+import sqlite3
 
 logging.basicConfig(
     level=logging.INFO,
@@ -11,7 +11,6 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 logger = logging.getLogger(__name__)
-
 
 def main(db_file, output_dir):
     logger.info(f"Connecting to database: {db_file}")

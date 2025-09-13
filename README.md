@@ -5,6 +5,12 @@
 
 Simple Python 3 script to dump a SQLite database to a set of CSV files.
 
+## Features
+
+- [x] Dumps all tables in a SQLite database to individual CSV files;
+- [x] Rich logging for better tracking of the process;
+- [x] Set logging level (DEBUG, INFO, WARNING, ERROR);
+
 ## Usage
 
 ```bash
